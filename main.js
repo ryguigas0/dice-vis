@@ -8,10 +8,16 @@ function makeGraph() {
     let diceSides = Number.parseInt(diceSidesSelect.value)
     let rolls = rollsByQuantity(calcRolls(diceSides))
 
+    const rollQuants = Object.values(rolls)
+
+    const maxRollQuant = rollQuants.sort().reverse()[0]
+
     const maxHeight = graphSVG.property("height").baseVal.value
+    const minHeight = 40
     const maxWidth = graphSVG.property("width").baseVal.value
     const barXOffset = maxWidth / (diceSides + 30)
     const barWidth = maxWidth / (Object.keys(rolls).length + 30)
+    const barHeightScale = maxHeight / maxRollQuant
 
 
     let data = []
@@ -23,9 +29,10 @@ function makeGraph() {
 
         data.push({
             x: (barWidth + barXOffset) * i,
-            y: 10,
-            height: maxHeight / rollQuant,
-            width: barWidth
+            y: minHeight,
+            height: rollQuant * barHeightScale,
+            width: barWidth,
+            rollValue: rollValue
         })
     }
 
@@ -38,7 +45,15 @@ function makeGraph() {
         .attr("height", (d) => d.height)
         .attr("width", (d) => d.width)
 
-    console.log("Graph rendered!")
+    graphSVG
+        .selectAll("text")
+        .data(data)
+        .join("text")
+        .text((d) => `${d.rollValue}`)
+        .attr("y", minHeight)
+        .attr("x", (d) => d.x)
+
+    // console.log({ msg: "Graph rendered!", data, rolls })
 }
 
 function rollsByQuantity(rolls) {
@@ -83,7 +98,7 @@ function calcRolls(diceSides) {
 }
 
 function rollDice(sides) {
-    return Math.floor(Math.random() * (sides - 1) + 1);
+    return Math.floor(Math.random() * (sides - 1 + 1) + 1);
 }
 
 console.log("main.js is loaded!")
