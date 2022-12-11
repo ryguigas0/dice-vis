@@ -1,0 +1,20 @@
+body {
+    text-align: center;
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-wrapper>input {
+    max-width: 100%;
+}
+
+.row+.row {
+    padding-top: 1rem;
+}
+
+.input-container {
+    max-width: 355px;
+}
