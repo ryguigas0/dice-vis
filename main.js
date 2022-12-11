@@ -2,11 +2,43 @@ const diceSidesSelect = document.querySelector("#dice-sides")
 const rollTypeSelect = document.querySelector("#roll-type")
 const rollModInput = document.querySelector("#roll-modifier")
 const rollQuanityInput = document.querySelector("#roll-quantity")
+const graphSVG = d3.select("#graph").append("svg").attr("class", "graph")
 
 function makeGraph() {
-    let rolls = calcRolls()
+    let diceSides = Number.parseInt(diceSidesSelect.value)
+    let rolls = rollsByQuantity(calcRolls(diceSides))
 
-    console.log(rolls)
+    const maxHeight = graphSVG.property("height").baseVal.value
+    const maxWidth = graphSVG.property("width").baseVal.value
+    const barXOffset = maxWidth / (diceSides + 30)
+    const barWidth = maxWidth / (Object.keys(rolls).length + 30)
+
+
+    let data = []
+
+    for (let i = 0; i < Object.keys(rolls).length; i++) {
+        const rollValue = Object.keys(rolls)[i];
+        const rollQuant = Object.values(rolls)[i];
+
+
+        data.push({
+            x: (barWidth + barXOffset) * i,
+            y: 10,
+            height: maxHeight / rollQuant,
+            width: barWidth
+        })
+    }
+
+    graphSVG
+        .selectAll("rect")
+        .data(data)
+        .join("rect")
+        .attr("y", (d) => d.y)
+        .attr("x", (d) => d.x)
+        .attr("height", (d) => d.height)
+        .attr("width", (d) => d.width)
+
+    console.log("Graph rendered!")
 }
 
 function rollsByQuantity(rolls) {
@@ -24,8 +56,7 @@ function rollsByQuantity(rolls) {
     return dict
 }
 
-function calcRolls() {
-    let diceSides = Number.parseInt(diceSidesSelect.value)
+function calcRolls(diceSides) {
     let rollType = rollTypeSelect.value
     let rollMod = Number.parseInt(rollModInput.value)
     let rollQuant = Number.parseInt(rollQuanityInput.value)
